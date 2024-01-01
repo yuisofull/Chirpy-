@@ -16,10 +16,17 @@ func middlewareCors(next http.Handler) http.Handler {
 }
 
 func main() {
+
 	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(http.Dir(".")))
 	corsMux := middlewareCors(mux)
-	http.HandleFunc("/", corsMux.ServeHTTP)
-	err := http.ListenAndServe("localhost:8080", nil)
+
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: corsMux,
+	}
+
+	err := srv.ListenAndServe()
 	if err != nil {
 		return
 	}
